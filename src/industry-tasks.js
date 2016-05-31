@@ -1,39 +1,5 @@
-let not_tasks = [ "init", "run", "description" ]
-
-function instanceTasks({ ignore, instance }) {
-  if (!instance.functions) { return [] }
-  return Object.keys(instance.functions()).filter(name =>
-    ignore.indexOf(name) == -1 && not_tasks.indexOf(name) == -1
-  ).sort()
-}
-
-function taskDesc({ ignore, prev="", tasks }) {
-  return tasks.reduce((arr, task) => {
-    if (!this[task]()) { return arr }
-    if (this[task]().description) {
-      arr.push([ 
-        `${prev}${task}`, this[task]().description()
-      ])
-    } else {
-      arr.push([ `${prev}${task}`, "" ])
-    }
-    return arr.concat(
-      taskDesc.bind(this[task]())({
-        ignore,
-        prev: `${prev}${task}.`,
-        tasks: instanceTasks({ ignore, instance: this[task]() })
-      })
-    )
-  }, [])
-}
-
-function taskToCommand({ instance, task }) {
-  return task
-    .split(".")
-    .reduce((instance, key) => {
-      if (instance[key]) { return instance[key] }
-    }, instance)
-}
+import minimist from "minimist"
+import { spacedTasks } from "./tasks"
 
 function patch(ignore, type) {
   for (let name in this.functions()) {
@@ -50,16 +16,37 @@ function runAndReturn({ args, bind_to, fn, name }) {
   return output
 }
 
+function runTask({ _, tasks, t }) {
+  if (tasks || t) {
+    return showTasks.bind(this)()
+  } else {
+    return {}
+  }
+}
+
+function showTasks() {
+  let tasks = spacedTasks({ instance: this })
+
+  if (this.tasks) {
+    return this.tasks({ tasks })
+  } else {
+    tasks.forEach(task => console.log(...task))
+  }
+
+  return tasks
+}
+
 export let tasks = Class =>
   class extends Class {
 
-    run() {
-      let ignore = this.Class.industry().ignore.instance
-      let tasks = instanceTasks({ ignore, instance: this })
+    run({ argv, slack }) {
+      argv = (argv || slack).split(/\s+/g)
+      if (argv) {
+        argv = minimist(argv)
+      } else {
+        argv = minimist(process.argv.slice(2))
+      }
 
-      console.log(taskDesc.bind(this)({ ignore, tasks }))
-      
-      if (super.run) super.run()
-      return {}
+      return runTask.bind(this)(argv)
     }
   }

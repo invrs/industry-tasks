@@ -22,7 +22,9 @@
   },
   "homepage": "https://github.com/invrs/industry-tasks#readme",
   "dependencies": {
-    "babel-runtime": "^6.6.1"
+    "babel-runtime": "^6.6.1",
+    "cli-color": "",
+    "minimist": ""
   },
   "devDependencies": {
     "babel": "^6.5.2",
@@ -37,6 +39,7 @@
     "industry-chain": "",
     "industry-exception": "",
     "industry-functions": "",
+    "industry-include": "",
     "industry-instance": "",
     "industry-standard-io": "",
     "jasmine": "^2.4.1",
