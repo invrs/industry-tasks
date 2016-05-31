@@ -8,6 +8,6 @@ describe("IndustryTasks", () => {
       }
     }
     let test = factory().base(base)
-    test().run({ argv: "--tasks" }).then(done)
+    test().run({ argv: "b tasks" }).then(done)
   })
 })

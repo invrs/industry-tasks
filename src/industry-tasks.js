@@ -1,5 +1,5 @@
 import minimist from "minimist"
-import { spacedTasks } from "./tasks"
+import { spacedTasks, taskToFactory } from "./tasks"
 
 function patch(ignore, type) {
   for (let name in this.functions()) {
@@ -16,11 +16,21 @@ function runAndReturn({ args, bind_to, fn, name }) {
   return output
 }
 
-function runTask({ _, tasks, t }) {
-  if (tasks || t) {
-    return showTasks.bind(this)()
+function runTask({ _ }) {
+  let factory
+  let task = _.shift()
+  let tasks = _.indexOf("tasks") > -1
+
+  if (task) {
+    factory = taskToFactory({ instance: this, task })()
   } else {
-    return {}
+    factory = this
+  }
+
+  if (tasks) {
+    return showTasks.bind(factory)()
+  } else {
+    return factory().run({ ...args, _ })
   }
 }
 
@@ -39,12 +49,13 @@ function showTasks() {
 export let tasks = Class =>
   class extends Class {
 
-    run({ argv, slack }) {
-      argv = (argv || slack).split(/\s+/g)
-      if (argv) {
+    run({ argv=process.argv.slice(2) }) {
+      if (typeof argv == "string") {
+        argv = argv.split(/\s+/g)
+      }
+
+      if (Array.isArray(argv)) {
         argv = minimist(argv)
-      } else {
-        argv = minimist(process.argv.slice(2))
       }
 
       return runTask.bind(this)(argv)

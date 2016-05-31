@@ -1,4 +1,4 @@
-import factory from "../helpers/factory"
+import factory from "../../helpers/factory"
 
 class C {
   description() { return "c" }

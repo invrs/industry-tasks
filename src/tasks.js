@@ -13,7 +13,14 @@ export function spacedTasks({ ignore, instance }) {
 }
 
 export function tasksWithDesc({ instance, prev="" }) {
-  let included = instance.Class.industry().included
+  let included
+
+  if (instance.Class) {
+    included = instance.Class.industry().included
+  } else {
+    included = Object.keys(instance)
+  }
+
   return included.reduce((arr, task) => {
     if (!instance[task]()) { return arr }
     if (instance[task]().description) {
@@ -25,14 +32,14 @@ export function tasksWithDesc({ instance, prev="" }) {
     }
     return arr.concat(
       tasksWithDesc({
-        instance: instance[task](),
+        instance: instance[task],
         prev: `${prev}${task}.`
       })
     )
   }, [])
 }
 
-export function taskToCommand({ instance, task }) {
+export function taskToFactory({ instance, task }) {
   return task
     .split(".")
     .reduce((instance, key) => {
