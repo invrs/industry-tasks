@@ -11,27 +11,21 @@ function patch(ignore, type) {
   }
 }
 
+function parseArgv(argv) {
+  if (typeof argv == "string") {
+    argv = argv.split(/\s+/g)
+  }
+
+  if (Array.isArray(argv)) {
+    argv = minimist(argv)
+  }
+
+  return argv
+}
+
 function runAndReturn({ args, bind_to, fn, name }) {
   let output = fn.bind(bind_to)(...args)
   return output
-}
-
-function runTask({ _ }) {
-  let factory
-  let task = _.shift()
-  let tasks = _.indexOf("tasks") > -1
-
-  if (task) {
-    factory = taskToFactory({ instance: this, task })()
-  } else {
-    factory = this
-  }
-
-  if (tasks) {
-    return showTasks.bind(factory)()
-  } else {
-    return factory().run({ ...args, _ })
-  }
 }
 
 function showTasks() {
@@ -50,14 +44,31 @@ export let tasks = Class =>
   class extends Class {
 
     run({ argv=process.argv.slice(2) }) {
-      if (typeof argv == "string") {
-        argv = argv.split(/\s+/g)
+      argv = parseArgv(argv)
+
+      let factory, task
+      let { _ } = argv
+      let tasks = _.indexOf("tasks") > -1 || _.indexOf("t") > -1
+      
+      if ([ "tasks", "t" ].indexOf(_[0]) == -1) {
+        task = _.shift()
       }
 
-      if (Array.isArray(argv)) {
-        argv = minimist(argv)
+      if (task) {
+        factory = taskToFactory({ instance: this, task })
+        if (typeof factory == "function") {
+          factory = factory()
+        }
+      } else {
+        factory = this
       }
 
-      return runTask.bind(this)(argv)
+      if (tasks) {
+        return showTasks.bind(factory)()
+      } else if (task) {
+        return factory.run({ ...argv, _ })
+      } else {
+        return super.run({ ...argv, _ })
+      }
     }
   }
