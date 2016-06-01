@@ -2,7 +2,7 @@ import factory from "../helpers/factory"
 
 class B {
   init() {
-    this.include(`${__dirname}/b`)
+    this._tasks = this.include(`${__dirname}/b`)
   }
   description() { return "b" }
 }

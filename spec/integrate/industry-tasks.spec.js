@@ -4,10 +4,10 @@ describe("IndustryTasks", () => {
   it("works", (done) => {
     let base = class {
       init() {
-        this.include(`${__dirname}/../fixture`)
+        this._tasks = this.include(`${__dirname}/../fixture`)
       }
     }
     let test = factory().base(base)
-    test().run({ argv: "tasks" }).then(done)
+    test().run({ argv: "b t" }).then(done)
   })
 })
