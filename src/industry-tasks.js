@@ -1,16 +1,6 @@
 import minimist from "minimist"
 import { spacedTasks, taskToFactory } from "./tasks"
 
-function patch(ignore, type) {
-  for (let name in this.functions()) {
-    if (ignore[type].indexOf(name) == -1) {
-      let fn = this[name]
-      this[name] = (...args) =>
-        runAndReturn({ args, bind_to: this, fn, name })
-    }
-  }
-}
-
 function parseArgv(argv) {
   if (typeof argv == "string") {
     argv = argv.split(/\s+/g)
@@ -21,11 +11,6 @@ function parseArgv(argv) {
   }
 
   return argv
-}
-
-function runAndReturn({ args, bind_to, fn, name }) {
-  let output = fn.bind(bind_to)(...args)
-  return output
 }
 
 function showTasks() {
@@ -70,8 +55,8 @@ export let tasks = Class =>
         return showTasks.bind(factory)()
       } else if (task) {
         return factory.run({ ...args, _ })
-      } else if (super.run) {
-        return super.run({ ...argv, _ })
+      } else if (this.task) {
+        return this.task({ ...argv, _ })
       }
     }
   }

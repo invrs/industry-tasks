@@ -2,7 +2,8 @@ import factory from "../../helpers/factory"
 
 class C {
   description() { return "c" }
-  run() {
+  task(args) {
+    console.log(args)
     console.log("ran!")
     return {}
   }
