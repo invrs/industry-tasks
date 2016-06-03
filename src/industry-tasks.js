@@ -30,12 +30,11 @@ export let tasks = Class =>
 
     run({ args, argv }) {
       if (argv) {
-        delete args.argv
-        args = parseArgv(argv)
+        argv = parseArgv(argv)
       }
 
       let factory, task
-      let { _ } = args
+      let { _ } = argv
       let tasks = _.indexOf("tasks") > -1 || _.indexOf("t") > -1
       
       if ([ "tasks", "t" ].indexOf(_[0]) == -1) {
@@ -53,10 +52,8 @@ export let tasks = Class =>
 
       if (tasks) {
         return showTasks.bind(factory)()
-      } else if (task) {
-        return factory.run({ ...args, _ })
-      } else if (this.task) {
-        return this.task({ ...argv, _ })
+      } else if (factory.task) {
+        return factory.task({ ...argv, _ })
       }
     }
   }
