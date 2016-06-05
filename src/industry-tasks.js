@@ -1,5 +1,5 @@
 import minimist from "minimist"
-import { spacedTasks, taskToFactory } from "./tasks"
+import { tasksToObject, taskToFactory } from "./tasks"
 
 function parseArgv(argv) {
   if (typeof argv == "string") {
@@ -14,9 +14,9 @@ function parseArgv(argv) {
 }
 
 function showTasks() {
-  let tasks = spacedTasks({ instance: this })
+  let tasks = tasksToObject({ instance: this })
 
-  if (this.tasks) {
+  if (typeof this.tasks == "function") {
     return this.tasks({ tasks })
   } else {
     tasks.forEach(task => console.log(...task))
