@@ -23,7 +23,10 @@
   "homepage": "https://github.com/invrs/industry-tasks#readme",
   "dependencies": {
     "babel-runtime": "^6.6.1",
+    "body-parser": "",
     "cli-color": "",
+    "express": "",
+    "express-x-hub": "",
     "minimist": ""
   },
   "devDependencies": {

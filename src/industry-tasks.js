@@ -1,4 +1,5 @@
 import minimist from "minimist"
+import webhooks from "./webhooks"
 import { tasksToObject, taskToFactory } from "./tasks"
 
 function parseArgv(argv) {
@@ -13,24 +14,26 @@ function parseArgv(argv) {
   return argv
 }
 
-function showTasks() {
-  let tasks = tasksToObject({ instance: this })
-
-  if (typeof this.tasks == "function") {
-    return this.tasks({ tasks })
-  } else {
-    tasks.forEach(task => console.log(...task))
-  }
-
-  return tasks
-}
-
 export let tasks = Class =>
   class extends Class {
 
-    run({ args, argv }) {
+    showTasks({ webhook }) {
+      let tasks = tasksToObject({ instance: this })
+
+      if (typeof this.tasks == "function") {
+        return this.tasks({ tasks, webhook })
+      }
+
+      return tasks
+    }
+
+    run({ argv, webhook }) {
       if (argv) {
         argv = parseArgv(argv)
+      }
+
+      if (argv.webhooks) {
+        return webhooks({ argv, instance: this })
       }
 
       let factory, task
@@ -51,9 +54,9 @@ export let tasks = Class =>
       }
 
       if (tasks) {
-        return showTasks.bind(factory)()
+        return this.showTasks.bind(factory)({ webhook })
       } else if (factory.task) {
-        return factory.task({ ...argv, _ })
+        return factory.task({ ...argv, _, webhook })
       }
     }
   }
