@@ -30,7 +30,7 @@ function routes({ app, instance, token }) {
     
     instance
       .run({ argv: cmd.text, webhook })
-      .then(() => res.send(output))
+      .then(() => res.send("```" + output + "```"))
   })
 
   return {}
