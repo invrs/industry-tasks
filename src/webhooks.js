@@ -40,6 +40,7 @@ export default function({ argv, instance }) {
   let options = {
     app: express(),
     port: process.env.PORT || 8009,
+    token: process.env.WEBHOOK_TOKEN,
     instance,
     ...argv
   }
