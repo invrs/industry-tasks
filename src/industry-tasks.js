@@ -28,6 +28,8 @@ export let tasks = Class =>
     }
 
     run({ argv, webhook }) {
+      webhook = webhook || (() => {})
+
       if (argv) {
         argv = parseArgv(argv)
       }
