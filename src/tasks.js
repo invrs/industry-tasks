@@ -7,14 +7,16 @@ export function tasksToObject({ instance, prev="" }) {
   return Object.keys(tasks).reduce((arr, task) => {
     let description
 
-    if (!tasks[task]()) { return arr }
-    
-    if (tasks[task]().description) {
-      description = tasks[task]().description().value
+    if (typeof tasks[task] == "function") {
+      if (!tasks[task]()) { return arr }
+      
+      if (tasks[task]().description) {
+        description = tasks[task]().description().value
+      }
+      
+      arr.push({ task: `${prev}${task}`, description })
     }
-    
-    arr.push({ task: `${prev}${task}`, description })
-    
+
     return arr.concat(
       tasksToObject({
         instance: { _tasks: tasks[task] },
